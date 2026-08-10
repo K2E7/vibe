@@ -22,7 +22,7 @@ import * as crypto from 'crypto';
 import * as cp from 'child_process';
 import * as i18n from './lib/i18n.ts';
 import { getProductionDependencies } from './lib/dependencies.ts';
-import { config } from './lib/electron.ts';
+import { config, getElectronConfigForTarget } from './lib/electron.ts';
 import { createAsar } from './lib/asar.ts';
 import minimist from 'minimist';
 import { compileBuildWithoutManglingTask, compileBuildWithManglingTask } from './gulpfile.compile.ts';
@@ -496,10 +496,11 @@ function packageTask(platform: string, arch: string, sourceFolderName: string, d
 			all = es.merge(all, shortcut, policyDest);
 		}
 
+		const targetArch = arch === 'armhf' ? 'arm' : arch;
 		const electronConfig = {
-			...config,
+			...getElectronConfigForTarget(platform, targetArch),
 			platform,
-			arch: arch === 'armhf' ? 'arm' : arch,
+			arch: targetArch,
 			ffmpegChromium: false
 		};
 
