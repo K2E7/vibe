@@ -47,11 +47,14 @@ async function getElectron() {
 }
 
 async function isExpectedElectronInstalled(): Promise<boolean> {
+	const { getElectronVersion } = await import('./util.ts');
+	const { getVibeElectronVersion } = await import('./vibeElectron.ts');
+	const { electronVersion } = getElectronVersion();
+	const expectedVersion = getVibeElectronVersion(electronVersion, process.platform, process.arch);
+
 	try {
-		const { getElectronVersion } = await import('./util.ts');
-		const { electronVersion } = getElectronVersion();
 		const installedVersion = (await fs.readFile(path.join(rootDir, '.build', 'electron', 'version'), 'utf8')).trim().replace(/^v/, '');
-		return installedVersion === electronVersion;
+		return installedVersion === expectedVersion;
 	} catch {
 		return false;
 	}

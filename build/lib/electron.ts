@@ -11,6 +11,7 @@ import { filter, jsonEditor } from './gulp/facade.ts';
 import * as util from './util.ts';
 import { getVersion } from './getVersion.ts';
 import { downloadFeedPackage } from './azureFeed.ts';
+import { getVibeElectronDownloadOverrides } from './vibeElectron.ts';
 import electron from '@vscode/gulp-electron';
 
 type DarwinDocumentSuffix = 'document' | 'script' | 'file' | 'source code';
@@ -245,12 +246,20 @@ export const config = {
 	productVersionString: versionedResourcesFolder,
 };
 
+export function getElectronConfigForTarget(platform: string, arch: string) {
+	return {
+		...config,
+		...getVibeElectronDownloadOverrides(electronVersion, platform, arch),
+	};
+}
+
 function getElectron(arch: string): () => NodeJS.ReadWriteStream {
 	return () => {
+		const targetArch = arch === 'armhf' ? 'arm' : arch;
 		const electronOpts = {
-			...config,
+			...getElectronConfigForTarget(process.platform, targetArch),
 			platform: process.platform,
-			arch: arch === 'armhf' ? 'arm' : arch,
+			arch: targetArch,
 			ffmpegChromium: false,
 			keepDefaultApp: true
 		};
