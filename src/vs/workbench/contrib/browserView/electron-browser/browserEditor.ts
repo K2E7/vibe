@@ -29,6 +29,7 @@ import { ILayoutService } from '../../../../platform/layout/browser/layoutServic
 import { IAction } from '../../../../base/common/actions.js';
 import { IActionViewItem } from '../../../../base/browser/ui/actionbar/actionbar.js';
 import { IActionViewItemOptions } from '../../../../base/browser/ui/actionbar/actionViewItems.js';
+import { IBrowserViewBounds } from '../../../../platform/browserView/common/browserView.js';
 
 export const CONTEXT_BROWSER_FOCUSED = new RawContextKey<boolean>('browserFocused', true, localize('browser.editorFocused', "Whether the browser editor is focused"));
 export const CONTEXT_BROWSER_HAS_URL = new RawContextKey<boolean>('browserHasUrl', false, localize('browser.hasUrl', "Whether the browser has a URL loaded"));
@@ -183,6 +184,12 @@ export abstract class BrowserEditorContribution extends Disposable {
 	 * and centers the viewport, then pixel-snap aligns it).
 	 */
 	beforeContainerLayout(): IContainerLayoutOverride | undefined { return undefined; }
+
+	/**
+	 * Forward final bounds to the renderer that presents the browser model.
+	 * Return true when the contribution handled the layout.
+	 */
+	layoutBrowserView(_bounds: IBrowserViewBounds): boolean { return false; }
 }
 
 /** Customization returned by {@link BrowserEditorContribution.beforeContainerLayout}. */
@@ -731,7 +738,7 @@ export class BrowserEditor extends EditorPane {
 		this._browserContainer.style.top = `${top}px`;
 
 		const cornerRadius = parseFloat(this.window.getComputedStyle(this._browserContainer).borderTopLeftRadius ?? '0');
-		void this._model.layout({
+		const bounds: IBrowserViewBounds = {
 			windowId: this.group.windowId,
 			x: wrapperRect.left + left,
 			y: wrapperRect.top + top,
@@ -740,7 +747,10 @@ export class BrowserEditor extends EditorPane {
 			zoomFactor: getZoomFactor(this.window),
 			cornerRadius,
 			emulation: layout.emulation,
-		});
+		};
+		if (![...this._contributionInstances.values()].some(contribution => contribution.layoutBrowserView(bounds))) {
+			void this._model.layout(bounds);
+		}
 
 		for (const c of this._contributionInstances.values()) {
 			c.afterContainerLayout();
