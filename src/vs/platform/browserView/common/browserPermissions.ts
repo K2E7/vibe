@@ -162,7 +162,6 @@ export const PERMISSION_CATEGORY_DESCRIPTORS: Readonly<Record<PermissionCategory
 	 * No-op in Electron due to missing backend support
 	 *   - Smart Cards (`smart-card`)
 	 *   - NFC (`nfc`)
-	 *   - Protected Content (`mediaKeySystem`)
 	 *   - Augmented / Virtual Reality, Hand Tracking (`ar`, `vr`, `hand-tracking`)
 	 *   - Payment Handlers (`payment-handler`)
 	 *   - Background Sync (`background-sync`, `periodic-background-sync`, `background-fetch`)
@@ -188,14 +187,15 @@ export const PERMISSION_CATEGORY_DESCRIPTORS: Readonly<Record<PermissionCategory
 
 /**
  * Raw Electron permission strings that are granted unconditionally, with no
- * recorded state and no management control. These are low-risk capabilities
- * that Chrome itself also always grants automatically.
+ * recorded state and no management control. These entries reflect Vibe's
+ * current browser policy; no permissions UI is provided for them.
  */
 export const ALWAYS_ALLOWED_PERMISSIONS: ReadonlySet<string> = new Set([
 	'pointerLock',
 	'keyboardLock',
 	'fullscreen',
 	'clipboard-sanitized-write',
+	'mediaKeySystem',
 ]);
 
 /** Whether a raw Electron permission string is granted unconditionally. */
