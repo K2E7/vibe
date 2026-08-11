@@ -10,6 +10,7 @@ import {
 	ISerializedBrowserPermissionsSnapshot,
 	PermissionCategory,
 	electronPermissionToCategories,
+	isAlwaysAllowedPermission,
 	toOriginKey,
 } from '../../common/browserPermissions.js';
 
@@ -130,6 +131,15 @@ suite('electronPermissionToCategories', () => {
 		assert.deepStrictEqual(electronPermissionToCategories('media'), [PermissionCategory.Camera, PermissionCategory.Microphone]);
 		assert.deepStrictEqual(electronPermissionToCategories('media', ['video']), [PermissionCategory.Camera]);
 		assert.deepStrictEqual(electronPermissionToCategories('media', ['audio']), [PermissionCategory.Microphone]);
+	});
+});
+
+suite('isAlwaysAllowedPermission', () => {
+
+	ensureNoDisposablesAreLeakedInTestSuite();
+
+	test('allows protected content', () => {
+		assert.strictEqual(isAlwaysAllowedPermission('mediaKeySystem'), true);
 	});
 });
 

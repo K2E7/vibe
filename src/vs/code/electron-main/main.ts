@@ -26,6 +26,7 @@ import { ProxyChannel } from '../../base/parts/ipc/common/ipc.js';
 import { Client as NodeIPCClient } from '../../base/parts/ipc/common/ipc.net.js';
 import { connect as nodeIPCConnect, serve as nodeIPCServe, Server as NodeIPCServer, XDG_RUNTIME_DIR } from '../../base/parts/ipc/node/ipc.net.js';
 import { CodeApplication } from './app.js';
+import { initializeVibeEcsComponents } from './vibeEcsComponents.js';
 import { localize } from '../../nls.js';
 import { IConfigurationService } from '../../platform/configuration/common/configuration.js';
 import { ConfigurationService } from '../../platform/configuration/common/configurationService.js';
@@ -156,6 +157,8 @@ class CodeMain {
 					instantiationService.invokeFunction(this.quit, new Error(message));
 					return;
 				}
+
+				await initializeVibeEcsComponents(logService);
 
 				return instantiationService.createInstance(CodeApplication, mainProcessNodeIpcServer, instanceEnvironment).startup();
 			});
